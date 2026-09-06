@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>새벽기도회 순서 슬라이드 생성기</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #181b1f;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .card {
+    width: 650px;
+    background: #252a32;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #363d47;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .header-cross {
+    display: inline-block;
+    color: #c29339;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffda85;
+    margin-bottom: 5px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    letter-spacing: 1px;
+  }
+
+  .form-group {
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #ffda85;
+  }
+
+  input[type="text"], input[type="date"] {
+    width: 100%;
+    padding: 12px 16px;
+    background: #1e232b;
+    border: 1.5px solid #4d5765;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  input[type="text"]:focus, input[type="date"]:focus {
+    border-color: #c29339;
+    box-shadow: 0 0 0 3px rgba(194, 147, 57, 0.2);
+  }
+
+  .btn {
+    width: 100%;
+    background: #c29339;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(194, 147, 57, 0.25);
+  }
+
+  .btn:hover {
+    background: #a87e2b;
+  }
+
+  .info-box {
+    margin-top: 25px;
+    background: #1e232b;
+    padding: 18px;
+    border-radius: 8px;
+    border-left: 4px solid #1e4a3d;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #94a3b8;
+  }
+
+  .info-box ul {
+    margin-left: 20px;
+    margin-top: 6px;
+  }
+
+  .info-box strong {
+    color: #ffda85;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="header-cross">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="currentColor">
+        <path d="M15 4h4v7h7v4h-7v15h-4V15H8v-4h7V4z"/>
+        <circle cx="17" cy="17" r="1.5" fill="#252a32"/>
+      </svg>
+    </div>
+    <h1>새벽기도회 순서 슬라이드 생성기</h1>
+    <div class="subtitle">Holy Seeds Church Dawn Prayer Slide Generator</div>
+  </div>
+
+  {% if error %}
+  <div style="background: rgba(239, 68, 68, 0.2); border: 1.5px solid #ef4444; color: #fca5a5; padding: 14px 18px; border-radius: 8px; margin-bottom: 25px; font-size: 14.5px; line-height: 1.5;">
+    ⚠️ <strong>오류 발생:</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  <form action="/dawn_offering/generate" method="POST">
+    <!-- 구글 시트 URL 정보를 hidden 필드로 처리하여 외부 노출 차단 -->
+    <input type="hidden" id="url" name="url" value="{{ default_url }}">
+
+    <div class="form-group">
+      <label for="date">기준 날짜 (Today)</label>
+      <input type="date" id="date" name="date" value="{{ default_date }}" required>
+    </div>
+
+    <button type="submit" class="btn">슬라이드 생성하기</button>
+  </form>
+
+  <div class="info-box">
+    <strong>💡 사용 안내 및 규칙</strong>
+    <ul>
+      <li><strong>날짜 기준 동작:</strong>
+        <ul>
+          <li><strong>월요일 ~ 금요일</strong>을 입력하면, 입력한 날짜가 포함된 <strong>이번 주(월~금)</strong>의 슬라이드가 생성됩니다.</li>
+          <li><strong>토요일 ~ 일요일</strong>을 입력하면, <strong>다음 주(월~금)</strong>의 슬라이드가 생성됩니다.</li>
+        </ul>
+      </li>
+      <li><strong>자동 열 이름(헤더) 매핑:</strong> 시트나 엑셀 파일 내의 헤더 행에서 다음 단어를 찾아 열을 자동으로 매핑합니다.
+        <ul>
+          <li><strong>날짜:</strong> 날짜, 일자, date</li>
+          <li><strong>인도:</strong> 인도자, 인도, leader</li>
+          <li><strong>기도자 1:</strong> 기도1, 기도자1, 회개, prayer1</li>
+          <li><strong>기도자 2:</strong> 기도2, 기도자2, 교회, prayer2</li>
+          <li><strong>방송지원:</strong> 방송지원, 방송, 음향, media, broadcast</li>
+          <li><strong>안내:</strong> 안내자, 안내, usher, guide</li>
+          <li><strong>찬양:</strong> 찬양, 찬송, 찬송가, praise, hymn</li>
+        </ul>
+      </li>
+      <li>만약 인식이 실패하는 경우, <strong>A열부터 순서대로</strong> [날짜, 인도, 기도자1, 기도자2, 방송지원, 안내, 찬양] 순서로 구성되어 있어도 정상 작동합니다.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 로딩 오버레이 레이어 -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(24, 27, 31, 0.88); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+  <div class="spinner" style="width: 55px; height: 50px; border: 5px solid #4d5765; border-top: 5px solid #c29339; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px;"></div>
+  <div style="font-family: 'Noto Sans KR', sans-serif; font-size: 19px; color: #ffda85; font-weight: 600; letter-spacing: 1px;">구글 드라이브에서 예배 데이터를 분석하는 중입니다...</div>
+  <div style="font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: #94a3b8; margin-top: 10px; text-align: center; line-height: 1.5;">잠시만 기다려 주세요.<br>완료되면 순서지 슬라이드가 자동으로 화면에 표출됩니다.</div>
+</div>
+
+<script>
+  // Set default date to today in user's browser local time
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedToday = `${year}-${month}-${day}`;
+  
+  // Set default in value attribute if it's currently 2026-09-06 (unless user is in 2026, we default to actual today)
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    // Keep 2026-09-06 default for demonstration or match if set in template, 
+    // but register submit interceptor to show loading indicator
+    document.querySelector('form').addEventListener('submit', function() {
+      document.getElementById('loading-overlay').style.display = 'flex';
+    });
+  }
+</script>
+</body>
+</html>

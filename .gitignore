@@ -1,0 +1,6 @@
+
+# GitHub Sync Script & Private Configurations
+syncgithub.env
+.env
+syncgithub.py
+__pycache__/
