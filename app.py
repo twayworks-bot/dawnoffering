@@ -314,8 +314,8 @@ def extract_chanyang_title(filename):
 @bp.route('/')
 def index():
     error = request.args.get('error')
-    # 기본 날짜를 2026-09-06으로 설정
-    default_date = "2026-09-06"
+    # 기본 날짜를 오늘 날짜(YYYY-MM-DD)로 설정
+    default_date = date.today().strftime('%Y-%m-%d')
     return render_template('index.html', error=error, default_url=DEFAULT_URL, default_date=default_date)
 
 @bp.route('/api/status')
